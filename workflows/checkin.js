@@ -31,14 +31,23 @@ class GrowthTask extends Task {
 
     const todayStatus = await growth.getTodayStatus();
     if (!todayStatus) {
-      const checkInResult = await growth.checkIn();
-
-      this.incrPoint = checkInResult.incr_point;
-      this.sumPoint = checkInResult.sum_point;
-      this.todayStatus = 1; // 本次签到
+      let success = false;
+      while (!success) {
+        try {
+          const checkInResult = await growth.checkIn();
+          this.incrPoint = checkInResult.incr_point;
+          this.sumPoint = checkInResult.sum_point;
+          this.todayStatus = 1; // 本次签到
+          success = true;
+        } catch (e) {
+          console.error("签到失败:", e.message);
+          await utils.wait(1000); // 等待1秒后重试
+        }
+      }
     } else {
       this.todayStatus = 2; // 已签到
     }
+
 
     const counts = await growth.getCounts();
     this.contCount = counts.cont_count;
