@@ -289,7 +289,6 @@ class CheckIn {
       .join("\n");
 
     return `
-掘友: ${this.username}
 ${
   {
     0: "签到失败",
@@ -312,6 +311,7 @@ ${
   //     : "收集Bug失败"
   // }
 }
+掘友: ${this.username}
 连续签到天数 ${this.growthTask.contCount}
 累计签到天数 ${this.growthTask.sumCount}
 当前矿石数 ${this.growthTask.sumPoint}
