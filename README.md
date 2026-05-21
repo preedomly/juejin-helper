@@ -64,7 +64,7 @@ DevTools截图:
 
 授权步骤: 登陆 [掘金](https://juejin.cn/) -> 每日签到 -> 海底掘金挑战赛(点击进入游戏, 点击授权, 最好再随意玩一局). 后续就可以由掘金助手自动处理.
 
-或点击👇这个海报帮您直达海底掘金挑战赛
+或点击👇这个海报帮您直达海底掘金挑战赛111
 
 [![海底掘金挑战赛](https://user-images.githubusercontent.com/24502299/151397151-0d69998a-2310-4a32-945f-c8e0035ed65d.png)](https://juejin.cn/game/haidijuejin/)
 
