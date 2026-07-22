@@ -282,7 +282,7 @@ class CheckIn {
     console.log('this.lotteriesTask.drawLotteryHistory --->', this.lotteriesTask.drawLotteryHistory);
     const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
       .map(([lottery_id, count]) => {
-        const lotteryItem = this.lotteriesTask.lottery.find(item => item.lottery_id === lottery_id);
+        const lotteryItem = this.lotteriesTask.lottery.find(item => item.lottery_id == lottery_id);
         if (lotteryItem) {
           return `${lotteryItem.lottery_name}: ${count}`;
         }
