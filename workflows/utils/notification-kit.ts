@@ -1,7 +1,7 @@
 import path from "path";
 import nodemailer from "nodemailer";
 import axios from "axios";
-import * as env from "./env";
+import * as env from "./env.ts";
 import pkg from "../package.json";
 
 interface NotificationOptions {
