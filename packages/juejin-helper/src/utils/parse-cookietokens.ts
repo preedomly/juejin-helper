@@ -9,8 +9,7 @@ function parseCookieTokens(cookie: Cookie) {
   };
 
   const tokensReg = /^__tea_cookie_tokens_(\d+)$/;
-  // @ts-ignore
-  for (const [key, value] of cookie.entries()) {
+  for (const [key, value] of cookie.entries() as IterableIterator<[string, string]>) {
     if (tokensReg.test(key)) {
       cookieTokens.aid = key.match(tokensReg)[1];
       const json = JSON.parse(decodeURIComponent(decodeURIComponent(value)));

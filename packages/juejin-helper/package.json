@@ -1,7 +1,7 @@
 {
   "name": "juejin-helper",
   "version": "1.7.2",
-  "description": "稀土掘金助手：签到、抽奖、沾喜气、海底淘金、BugFix、自动化工作流。",
+  "description": "稀土掘金助手：签到、抽奖、BugFix、自动化工作流。",
   "author": "Derek Li",
   "license": "Apache-2.0",
   "source": "src/index.ts",
@@ -11,11 +11,8 @@
   "scripts": {
     "test:login": "ts-node ./test/test-login.ts",
     "test:growth": "ts-node ./test/test-growth.ts",
-    "test:seagold": "ts-node ./test/test-seagold.ts",
     "test:bugfix": "ts-node ./test/test-bugfix.ts",
-    "test:numpuzz": "ts-node ./test/test-numpuzz.ts",
-    "test:sdk": "ts-node ./test/test-sdk.ts",
-    "test:browser": "ts-node ./test/test-browser.ts"
+    "test:sdk": "ts-node ./test/test-sdk.ts"
   },
   "files": [
     "build",
@@ -29,14 +26,12 @@
     "helper"
   ],
   "dependencies": {
-    "axios": "^0.27.2",
-    "jsonwebtoken": "^8.5.1",
-    "puppeteer": "^19.5.2",
-    "uuid": "^8.3.2"
+    "axios": "^1.7.0",
+    "tslib": "^2.8.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^8.5.8",
-    "@types/uuid": "^8.3.4"
+    "@types/uuid": "^10.0.0"
   },
   "repository": {
     "type": "git",
@@ -45,6 +40,5 @@
   "homepage": "https://github.com/iDerekLi/juejin-helper#readme",
   "bugs": {
     "url": "https://github.com/iDerekLi/juejin-helper/issues"
-  },
-  "gitHead": "00d4e093b02321d5a8ab45e0c07778195660dc73"
+  }
 }

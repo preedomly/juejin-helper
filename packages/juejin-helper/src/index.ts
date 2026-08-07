@@ -3,10 +3,7 @@ import { parseCookieTokens } from "./utils/index";
 import Cookie from "./utils/cookie";
 import Sdk from "./sdk";
 import Growth from "./growth";
-import SeaGold from "./seagold";
-import NumPuzz from "./numpuzz";
 import Bugfix from "./bugfix";
-import JuejinBrowser from "./utils/browser";
 
 type JuejinUserProps = {
   user_id: string;
@@ -66,20 +63,8 @@ class JuejinHelper {
     return new Growth(this);
   }
 
-  seagold() {
-    return new SeaGold(this);
-  }
-
-  numpuzz() {
-    return new NumPuzz(this);
-  }
-
   bugfix() {
     return new Bugfix(this);
-  }
-
-  browser() {
-    return new JuejinBrowser(this);
   }
 }
 

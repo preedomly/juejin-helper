@@ -2,22 +2,20 @@
   "name": "workflows",
   "version": "1.8.0",
   "private": true,
-  "description": "稀土掘金助手：签到、抽奖、沾喜气、消除Bug、海底掘金游戏、自动化工作流。",
+  "description": "稀土掘金助手：签到、抽奖、沾喜气、消除Bug、自动化工作流。",
   "author": "Derek Li",
   "scripts": {
-    "checkin": "ts-node checkin.js",
-    "seagold": "ts-node seagold.js"
+    "checkin": "ts-node checkin.ts"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "fast-astar": "^1.0.6",
+    "axios": "^1.7.0",
     "juejin-helper": "^1.7.2",
-    "nodemailer": "^6.7.0",
-    "typescript": "^4.7.4"
+    "nodemailer": "^6.9.0",
+    "typescript": "^5.5.0"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.7",
-    "ts-node": "^10.9.1"
+    "@types/nodemailer": "^6.4.17",
+    "ts-node": "^10.9.2"
   },
   "homepage": "https://github.com/iDerekLi/juejin-helper",
   "releases_url": "https://api.github.com/repos/iDerekLi/juejin-helper/releases"

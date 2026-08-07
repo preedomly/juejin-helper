@@ -1,6 +1,7 @@
 import { wait, randomRangeNumber } from "./utils/index";
 import JuejinHelper from "./index";
-import axios, { AxiosInstance } from "axios";
+import { AxiosInstance } from "axios";
+import { createJuejinApi } from "./utils/http";
 
 interface Bug {
   bug_type: number; // 类型位置
@@ -23,43 +24,7 @@ class Bugfix {
   http: AxiosInstance;
 
   constructor(juejin: JuejinHelper) {
-    this.http = axios.create({
-      baseURL: "https://api.juejin.cn",
-      headers: {
-        referer: "https://juejin.cn/",
-        origin: "https://juejin.cn"
-      }
-    });
-
-    this.http.interceptors.request.use(
-      function (config) {
-        if (!juejin) config;
-        // @ts-ignore
-        config.headers.cookie = juejin?.getCookie();
-
-        if ((juejin as JuejinHelper).user) {
-          const tokens = (juejin as JuejinHelper).getCookieTokens();
-          // @ts-ignore
-          config.url += `${config.url.indexOf("?") === -1 ? "?" : "&"}aid=${tokens.aid}&uuid=${tokens.uuid}`;
-        }
-        return config;
-      },
-      function (error) {
-        return Promise.reject(error);
-      }
-    );
-
-    this.http.interceptors.response.use(
-      function (response) {
-        if (response.data.err_no) {
-          throw new Error(response.data.err_msg);
-        }
-        return response.data.data;
-      },
-      function (error) {
-        return Promise.reject(error);
-      }
-    );
+    this.http = createJuejinApi(juejin);
   }
 
   /**
@@ -115,12 +80,10 @@ class Bugfix {
    */
   async collectBugBatch(buglist: Bug[] = []): Promise<boolean | unknown> {
     try {
-      await Promise.all(
-        buglist.map(async bug => {
-          await this.collectBug(bug);
-          await wait(randomRangeNumber(500, 1000));
-        })
-      );
+      for (const bug of buglist) {
+        await this.collectBug(bug);
+        await wait(randomRangeNumber(500, 1000));
+      }
       return true;
     } catch (error) {
       return error;

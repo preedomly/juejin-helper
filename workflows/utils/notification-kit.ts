@@ -1,7 +1,7 @@
 import path from "path";
 import nodemailer from "nodemailer";
 import axios from "axios";
-import env from "./env";
+import * as env from "./env";
 import pkg from "../package.json";
 
 interface NotificationOptions {
@@ -126,7 +126,7 @@ export class NotificationKit {
       timestamp: ""
     };
 
-    return axios.post("http://www.pushplus.plus/send", config, {
+    return axios.post("https://www.pushplus.plus/send", config, {
       headers: {
         "Content-Type": "application/json"
       }

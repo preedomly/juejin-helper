@@ -1,10 +1,12 @@
 import notification from "./utils/notification-kit";
-const JuejinHelper = require("juejin-helper");
-const utils = require("./utils/utils");
-const env = require("./utils/env");
+import JuejinHelper from "juejin-helper";
+import * as utils from "./utils/utils";
+import * as env from "./utils/env";
 
 class Task {
-  constructor(juejin) {
+  juejin: JuejinHelper;
+
+  constructor(juejin: JuejinHelper) {
     this.juejin = juejin;
   }
 
@@ -39,7 +41,7 @@ class GrowthTask extends Task {
           this.sumPoint = checkInResult.sum_point;
           this.todayStatus = 1; // 本次签到
           success = true;
-        } catch (e) {
+        } catch (e: any) {
           console.error("签到失败:", e.message);
           await utils.wait(1000); // 等待1秒后重试
         }
@@ -56,27 +58,12 @@ class GrowthTask extends Task {
 }
 
 class DipLuckyTask extends Task {
-  taskName = "沾喜气";
+  taskName = "幸运值";
 
-  dipStatus = -1;
-  dipValue = 0;
   luckyValue = 0;
 
   async run() {
     const growth = this.juejin.growth();
-
-    // 掘金沾喜气功能以停用！
-    // const luckyusersResult = await growth.getLotteriesLuckyUsers();
-    // if (luckyusersResult.count > 0) {
-    //   const no1LuckyUser = luckyusersResult.lotteries[0];
-    //   const dipLuckyResult = await growth.dipLucky(no1LuckyUser.history_id);
-    //   if (dipLuckyResult.has_dip) {
-    //     this.dipStatus = 2;
-    //   } else {
-    //     this.dipStatus = 1;
-    //     this.dipValue = dipLuckyResult.dip_value;
-    //   }
-    // }
 
     const luckyResult = await growth.getMyLucky();
     this.luckyValue = luckyResult.total_value;
@@ -86,8 +73,6 @@ class DipLuckyTask extends Task {
 class BugfixTask extends Task {
   taskName = "Bugfix";
 
-  bugStatus = -1;
-  collectBugCount = 0;
   userOwnBug = 0;
 
   async run() {
@@ -96,31 +81,20 @@ class BugfixTask extends Task {
     const competition = await bugfix.getCompetition();
     const bugfixInfo = await bugfix.getUser(competition);
     this.userOwnBug = bugfixInfo.user_own_bug;
-
-    // 掘金Bugfix功能已停用。
-    // try {
-    //   const notCollectBugList = await bugfix.getNotCollectBugList();
-    //   await bugfix.collectBugBatch(notCollectBugList);
-    //   this.bugStatus = 1;
-    //   this.collectBugCount = notCollectBugList.length;
-    //   this.userOwnBug += this.collectBugCount;
-    // } catch (e) {
-    //   this.bugStatus = 2;
-    // }
   }
 }
 
 class LotteriesTask extends Task {
   taskName = "抽奖";
 
-  lottery = []; // 奖池
+  lottery: any[] = []; // 奖池
   pointCost = 0; // 一次抽奖消耗
   freeCount = 0; // 免费抽奖次数
-  drawLotteryHistory = {};
+  drawLotteryHistory: Record<string, number> = {};
   lotteryCount = 0;
   luckyValueProbability = 0;
 
-  async run(growthTask, dipLuckyTask) {
+  async run(growthTask: GrowthTask, dipLuckyTask: DipLuckyTask) {
     const growth = this.juejin.growth();
 
     const lotteryConfig = await growth.getLotteryConfig();
@@ -141,7 +115,7 @@ class LotteriesTask extends Task {
 
     growthTask.sumPoint = await growth.getCurrentPoint();
 
-    const getProbabilityOfWinning = sumPoint => {
+    const getProbabilityOfWinning = (sumPoint: number) => {
       const pointCost = this.pointCost;
       const luckyValueCost = 10;
       const totalDrawsNumber = sumPoint / pointCost;
@@ -205,41 +179,16 @@ class SdkTask extends Task {
   }
 }
 
-class MockVisitTask extends Task {
-  taskName = "模拟访问";
-
-  async run() {
-    console.log("--------模拟访问---------");
-    try {
-      const browser = this.juejin.browser();
-      await browser.open();
-      try {
-        await browser.visitPage("/");
-        console.log("掘金首页：页面访问成功");
-      } catch (e) {
-        console.log("掘金首页：页面访问失败");
-      }
-      await utils.wait(utils.randomRangeNumber(2000, 5000));
-      try {
-        await browser.visitPage("/user/center/signin");
-        console.log("掘金每日签到：页面访问成功");
-      } catch (e) {
-        console.log("掘金每日签到：页面访问失败");
-      }
-      await utils.wait(utils.randomRangeNumber(2000, 5000));
-      await browser.close();
-    } catch {
-      console.log("浏览器API异常");
-    }
-    console.log("-------------------------");
-  }
-}
-
 class CheckIn {
   cookie = "";
   username = "";
+  growthTask!: GrowthTask;
+  dipLuckyTask!: DipLuckyTask;
+  lotteriesTask!: LotteriesTask;
+  bugfixTask!: BugfixTask;
+  sdkTask!: SdkTask;
 
-  constructor(cookie) {
+  constructor(cookie: string) {
     this.cookie = cookie;
   }
 
@@ -247,21 +196,19 @@ class CheckIn {
     const juejin = new JuejinHelper();
     try {
       await juejin.login(this.cookie);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e.message);
       throw new Error("登录失败, 请尝试更新Cookies!");
     }
 
-    this.username = juejin.getUser().user_name;
+    this.username = juejin.getUser()!.user_name;
 
     this.growthTask = new GrowthTask(juejin);
     this.dipLuckyTask = new DipLuckyTask(juejin);
     this.lotteriesTask = new LotteriesTask(juejin);
     this.bugfixTask = new BugfixTask(juejin);
     this.sdkTask = new SdkTask(juejin);
-    this.mockVisitTask = new MockVisitTask(juejin);
 
-    await this.mockVisitTask.run();
     await this.sdkTask.run();
     console.log(`运行 ${this.growthTask.taskName}`);
     await this.growthTask.run();
@@ -282,7 +229,7 @@ class CheckIn {
     console.log('this.lotteriesTask.drawLotteryHistory --->', this.lotteriesTask.drawLotteryHistory);
     const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
       .map(([lottery_id, count]) => {
-        const lotteryItem = this.lotteriesTask.lottery.find(item => item.lottery_id == lottery_id);
+        const lotteryItem = this.lotteriesTask.lottery.find((item: any) => item.lottery_id == lottery_id);
         if (lotteryItem) {
           return `${lotteryItem.lottery_name}: ${count}`;
         }
@@ -290,13 +237,14 @@ class CheckIn {
       })
       .join("\n");
 
+    const statusMap: Record<number, string> = {
+      0: "签到失败",
+      1: `签到成功 +${this.growthTask.incrPoint} 矿石`,
+      2: "今日已完成签到"
+    };
+
     return `
-      ${{
-        0: "签到失败",
-        1: `签到成功 +${this.growthTask.incrPoint} 矿石`,
-        2: "今日已完成签到"
-      }[this.growthTask.todayStatus]
-      }
+      ${statusMap[this.growthTask.todayStatus] || ""}
         掘友: ${this.username}
         连续签到天数 ${this.growthTask.contCount}
         累计签到天数 ${this.growthTask.sumCount}
@@ -311,10 +259,10 @@ class CheckIn {
   }
 }
 
-async function run(args) {
+async function run() {
   const cookies = utils.getUsersCookie(env);
-  let messageList = [];
-  for (let cookie of cookies) {
+  const messageList: string[] = [];
+  for (const cookie of cookies) {
     const checkin = new CheckIn(cookie);
 
     await utils.wait(utils.randomRangeNumber(1000, 5000)); // 初始等待1-5s
@@ -334,7 +282,7 @@ async function run(args) {
   });
 }
 
-run(process.argv.splice(2)).catch(error => {
+run(process.argv.splice(2)).catch((error: Error) => {
   notification.pushMessage({
     title: "掘金每日签到",
     content: `<strong>Error</strong><pre>${error.message}</pre>`,

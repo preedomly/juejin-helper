@@ -24,22 +24,14 @@ jobs:
   CheckIn:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: workflows/package-lock.json
       - name: Run Project
         run: |
           cd workflows
-          npm install
-          npm run checkin
-
-#  SeaGold:
-#    needs: CheckIn
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - uses: actions/setup-node@v2
-#      - name: Run Project
-#        run: |
-#          cd workflows
-#          yarn
-#          yarn seagold 
+          npm ci
+          npm run checkin 

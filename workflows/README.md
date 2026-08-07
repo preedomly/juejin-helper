@@ -1,8 +1,5 @@
 # Juejin Workflows 掘金工作流
 
-## 通知
-🔈 海底掘金游戏官方已下线 `juejin-helper >= 1.7.3`
-
 ## 开始使用
 
 下载项目 或 [ clone the repo:](https://github.com/iDerekLi/juejin-helper)
@@ -15,16 +12,12 @@ cd workflows
 ```shell
 yarn
 yarn checkin
-yarn seagold
 ```
 
-运行脚本前 配置环境变量 `/workflows/utils/env.js`
+运行脚本前 配置环境变量 `/workflows/utils/env.ts`
 
-```javascript
-module.exports = {
-  COOKIE: "掘金Cookie"
-  // ...
-};
+```typescript
+export const COOKIE = "掘金Cookie";
 ```
 
 | Name | Value | Required |
@@ -36,5 +29,7 @@ module.exports = {
 | EMAIL_TO | 订阅人邮箱地址(收件人). 如需多人订阅使用 `, ` 分割, 例如: `a@163.com, b@qq.com` | 否 |
 | DINGDING_WEBHOOK | 钉钉机器人WEBHOOK | 否 |
 | PUSHPLUS_TOKEN | [Pushplus](http://www.pushplus.plus/) 官网申请，支持微信消息推送 | 否 |
-|   WEIXIN_WEBHOOK | 企业微信机器人WEBHOOK                                    | 否 |
+| WEIXIN_WEBHOOK | 企业微信机器人WEBHOOK | 否 |
+| SERVERPUSHKEY | [Server酱](https://sct.ftqq.com/) 官网申请，支持微信消息推送 | 否 |
+| FEISHU_WEBHOOK | 飞书机器人WEBHOOK | 否 |
 

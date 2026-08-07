@@ -19,7 +19,7 @@ async function run() {
   });
 
   packages.forEach(pkg => {
-    const { version, source, main, module, types, dependencies, devDependencies } = pkg.config;
+    const { version, source, main, module, types, dependencies } = pkg.config;
 
     const banner = [
       `/*!`,
@@ -36,7 +36,7 @@ async function run() {
 
     results.push({
       input,
-      external: [...Object.keys(dependencies), ...Object.keys(devDependencies)],
+      external: Object.keys(dependencies),
       output: [
         { banner, file: path.join(basePath, main), format: "cjs" },
         { banner, file: path.join(basePath, module), format: "esm" }

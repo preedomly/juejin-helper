@@ -1,7 +1,6 @@
 import { generateUUID, randomRangeNumber } from "./utils/index";
 import JuejinHelper from "./index";
 import snssdk from "./services/snssdk";
-import axios from "axios";
 
 interface SDKSetting {
   cookieid: string;
