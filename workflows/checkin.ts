@@ -87,12 +87,13 @@ class BugfixTask extends Task {
 class LotteriesTask extends Task {
   taskName = "抽奖";
 
-  lottery: any[] = []; // 奖池
-  pointCost = 0; // 一次抽奖消耗
-  freeCount = 0; // 免费抽奖次数
+  lottery: any[] = [];
+  pointCost = 0;
+  freeCount = 0;
   drawLotteryHistory: Record<string, number> = {};
   lotteryCount = 0;
   luckyValueProbability = 0;
+  lotteryOreGained = 0;
 
   async run(growthTask: GrowthTask, dipLuckyTask: DipLuckyTask) {
     const growth = this.juejin.growth();
@@ -102,11 +103,13 @@ class LotteriesTask extends Task {
     this.pointCost = lotteryConfig.point_cost;
     this.freeCount = lotteryConfig.free_count;
     this.lotteryCount = 0;
+    this.lotteryOreGained = 0;
 
     let freeCount = this.freeCount;
     while (freeCount > 0) {
       const result = await growth.drawLottery();
       this.drawLotteryHistory[result.lottery_id] = (this.drawLotteryHistory[result.lottery_id] || 0) + 1;
+      this.lotteryOreGained += result.incr_point || 0;
       dipLuckyTask.luckyValue = result.total_lucky_value;
       freeCount--;
       this.lotteryCount++;
@@ -134,48 +137,26 @@ class LotteriesTask extends Task {
 class SdkTask extends Task {
   taskName = "埋点";
 
-  calledSdkSetting = false;
-  calledTrackGrowthEvent = false;
-  calledTrackOnloadEvent = false;
-
   async run() {
-    console.log("------事件埋点追踪-------");
-
     const sdk = this.juejin.sdk();
+
+    let sdkOk = false, growthOk = false, onloadOk = false;
 
     try {
       await sdk.slardarSDKSetting();
-      this.calledSdkSetting = true;
-    } catch {
-      this.calledSdkSetting = false;
-    }
-    console.log(`SDK状态: ${this.calledSdkSetting ? "加载成功" : "加载失败"}`);
-
+      sdkOk = true;
+    } catch {}
     try {
       const result = await sdk.mockTrackGrowthEvent();
-      if (result && result.e === 0) {
-        this.calledTrackGrowthEvent = true;
-      } else {
-        throw result;
-      }
-    } catch {
-      this.calledTrackGrowthEvent = false;
-    }
-    console.log(`成长API事件埋点: ${this.calledTrackGrowthEvent ? "调用成功" : "调用失败"}`);
-
+      growthOk = !!(result && result.e === 0);
+    } catch {}
     try {
       const result = await sdk.mockTrackOnloadEvent();
-      if (result && result.e === 0) {
-        this.calledTrackOnloadEvent = true;
-      } else {
-        throw result;
-      }
-    } catch {
-      this.calledTrackOnloadEvent = false;
-    }
-    console.log(`OnLoad事件埋点: ${this.calledTrackOnloadEvent ? "调用成功" : "调用失败"}`);
+      onloadOk = !!(result && result.e === 0);
+    } catch {}
 
-    console.log("-------------------------");
+    const ok = [sdkOk, growthOk, onloadOk].filter(Boolean).length;
+    console.log(`埋点: ${ok}/3 成功`);
   }
 }
 
@@ -210,13 +191,9 @@ class CheckIn {
     this.sdkTask = new SdkTask(juejin);
 
     await this.sdkTask.run();
-    console.log(`运行 ${this.growthTask.taskName}`);
     await this.growthTask.run();
-    console.log(`运行 ${this.dipLuckyTask.taskName}`);
     await this.dipLuckyTask.run();
-    console.log(`运行 ${this.lotteriesTask.taskName}`);
     await this.lotteriesTask.run(this.growthTask, this.dipLuckyTask);
-    console.log(`运行 ${this.bugfixTask.taskName}`);
     await this.bugfixTask.run();
     await juejin.logout();
     console.log("-------------------------");
@@ -225,8 +202,6 @@ class CheckIn {
   }
 
   toString() {
-
-    console.log('this.lotteriesTask.drawLotteryHistory --->', this.lotteriesTask.drawLotteryHistory);
     const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
       .map(([lottery_id, count]) => {
         const lotteryItem = this.lotteriesTask.lottery.find((item: any) => item.lottery_id == lottery_id);
@@ -254,6 +229,7 @@ class CheckIn {
         预测All In矿石累计幸运值比率 ${(this.lotteriesTask.luckyValueProbability * 100).toFixed(2) + "%"}
         抽奖总次数 ${this.lotteriesTask.lotteryCount}
         免费抽奖次数 ${this.lotteriesTask.freeCount}
+        ${this.lotteriesTask.lotteryOreGained > 0 ? `抽奖获得矿石 ${this.lotteriesTask.lotteryOreGained}` : ""}
         ${this.lotteriesTask.lotteryCount > 0 ? "==============\n" + drawLotteryHistory + "\n==============" : ""}
         `.trim();
   }
