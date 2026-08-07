@@ -1,9 +1,8 @@
 import JuejinHelper from "./index";
-import { AxiosInstance } from "axios";
-import { createJuejinApi } from "./utils/http";
+import { JuejinApiClient, createJuejinApi } from "./utils/http";
 
 class Growth {
-  http: AxiosInstance;
+  http: JuejinApiClient;
 
   constructor(juejin: JuejinHelper) {
     this.http = createJuejinApi(juejin);

@@ -1,7 +1,6 @@
 import { wait, randomRangeNumber } from "./utils/index";
 import JuejinHelper from "./index";
-import { AxiosInstance } from "axios";
-import { createJuejinApi } from "./utils/http";
+import { JuejinApiClient, createJuejinApi } from "./utils/http";
 
 interface Bug {
   bug_type: number; // 类型位置
@@ -21,7 +20,7 @@ interface User {
 }
 
 class Bugfix {
-  http: AxiosInstance;
+  http: JuejinApiClient;
 
   constructor(juejin: JuejinHelper) {
     this.http = createJuejinApi(juejin);

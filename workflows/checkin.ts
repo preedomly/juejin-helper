@@ -12,7 +12,7 @@ class Task {
 
   taskName = "";
 
-  async run() { }
+  async run(...args: any[]): Promise<void> { }
 
   toString() {
     return `[${this.taskName}]`;
@@ -282,7 +282,7 @@ async function run() {
   });
 }
 
-run(process.argv.splice(2)).catch((error: Error) => {
+run().catch((error: Error) => {
   notification.pushMessage({
     title: "掘金每日签到",
     content: `<strong>Error</strong><pre>${error.message}</pre>`,

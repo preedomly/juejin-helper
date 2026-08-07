@@ -1,7 +1,12 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import JuejinHelper from "../index";
 
-export function createJuejinApi(juejin: JuejinHelper, config?: AxiosRequestConfig): AxiosInstance {
+export interface JuejinApiClient {
+  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
+}
+
+export function createJuejinApi(juejin: JuejinHelper, config?: AxiosRequestConfig): JuejinApiClient {
   const http = axios.create({
     baseURL: "https://api.juejin.cn",
     headers: {
@@ -40,5 +45,5 @@ export function createJuejinApi(juejin: JuejinHelper, config?: AxiosRequestConfi
     }
   );
 
-  return http;
+  return http as unknown as JuejinApiClient;
 }
