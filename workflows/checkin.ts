@@ -1,13 +1,12 @@
 import notification from "./utils/notification-kit";
-// @ts-ignore - 使用 npm 已发布版本的类型，与本地修改不兼容
 const JuejinHelper = require("juejin-helper");
 import * as utils from "./utils/utils";
 import * as env from "./utils/env";
 
 class Task {
-  juejin: JuejinHelper;
+  juejin: any;
 
-  constructor(juejin: JuejinHelper) {
+  constructor(juejin: any) {
     this.juejin = juejin;
   }
 
