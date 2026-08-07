@@ -1,7 +1,7 @@
-import notification from "./utils/notification-kit.ts";
+import notification from "./utils/notification-kit";
 const JuejinHelper = require("juejin-helper");
-import * as utils from "./utils/utils.ts";
-import * as env from "./utils/env.ts";
+import * as utils from "./utils/utils";
+import * as env from "./utils/env";
 
 class Task {
   juejin: any;
