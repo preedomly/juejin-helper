@@ -1,0 +1,35 @@
+name: Lottery
+
+on:
+  schedule:
+    - cron: "0 12 * * *" # 北京时间晚上20:00
+  workflow_dispatch:
+
+env:
+  COOKIE: ${{ secrets.COOKIE }}
+  COOKIE_2: ${{ secrets.COOKIE_2 }}
+  COOKIE_3: ${{ secrets.COOKIE_3 }}
+  COOKIE_4: ${{ secrets.COOKIE_4 }}
+  COOKIE_5: ${{ secrets.COOKIE_5 }}
+  EMAIL_USER: ${{ secrets.EMAIL_USER }}
+  EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+  EMAIL_TO: ${{ secrets.EMAIL_TO }}
+  DINGDING_WEBHOOK: ${{ secrets.DINGDING_WEBHOOK }}
+  PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+  WEIXIN_WEBHOOK: ${{ secrets.WEIXIN_WEBHOOK }}
+  SERVERPUSHKEY: ${{ secrets.SERVERPUSHKEY }}
+  FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+
+jobs:
+  Lottery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run Project
+        run: |
+          cd workflows
+          npm install
+          npm run lottery

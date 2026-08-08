@@ -5,7 +5,8 @@
   "description": "稀土掘金助手：签到、抽奖、沾喜气、消除Bug、自动化工作流。",
   "author": "Derek Li",
   "scripts": {
-    "checkin": "ts-node checkin.ts"
+    "checkin": "ts-node checkin.ts",
+    "lottery": "ts-node lottery.ts"
   },
   "dependencies": {
     "axios": "^1.7.0",

@@ -54,6 +54,8 @@ class GrowthTask extends Task {
     const counts = await growth.getCounts();
     this.contCount = counts.cont_count;
     this.sumCount = counts.sum_count;
+
+    this.sumPoint = await growth.getCurrentPoint();
   }
 }
 
@@ -81,56 +83,6 @@ class BugfixTask extends Task {
     const competition = await bugfix.getCompetition();
     const bugfixInfo = await bugfix.getUser(competition);
     this.userOwnBug = bugfixInfo.user_own_bug;
-  }
-}
-
-class LotteriesTask extends Task {
-  taskName = "抽奖";
-
-  lottery: any[] = [];
-  pointCost = 0;
-  freeCount = 0;
-  drawLotteryHistory: Record<string, number> = {};
-  lotteryCount = 0;
-  luckyValueProbability = 0;
-  lotteryOreGained = 0;
-
-  async run(growthTask: GrowthTask, dipLuckyTask: DipLuckyTask) {
-    const growth = this.juejin.growth();
-
-    const lotteryConfig = await growth.getLotteryConfig();
-    this.lottery = lotteryConfig.lottery;
-    this.pointCost = lotteryConfig.point_cost;
-    this.freeCount = lotteryConfig.free_count;
-    this.lotteryCount = 0;
-    this.lotteryOreGained = 0;
-
-    let freeCount = this.freeCount;
-    while (freeCount > 0) {
-      const result = await growth.drawLottery();
-      this.drawLotteryHistory[result.lottery_id] = (this.drawLotteryHistory[result.lottery_id] || 0) + 1;
-      this.lotteryOreGained += result.incr_point || 0;
-      dipLuckyTask.luckyValue = result.total_lucky_value;
-      freeCount--;
-      this.lotteryCount++;
-      await utils.wait(utils.randomRangeNumber(300, 1000));
-    }
-
-    growthTask.sumPoint = await growth.getCurrentPoint();
-
-    const getProbabilityOfWinning = (sumPoint: number) => {
-      const pointCost = this.pointCost;
-      const luckyValueCost = 10;
-      const totalDrawsNumber = sumPoint / pointCost;
-      let supplyPoint = 0;
-      for (let i = 0, length = Math.floor(totalDrawsNumber * 0.65); i < length; i++) {
-        supplyPoint += Math.ceil(Math.random() * 100);
-      }
-      const luckyValue = ((sumPoint + supplyPoint) / pointCost) * luckyValueCost + dipLuckyTask.luckyValue;
-      return luckyValue / 6000;
-    };
-
-    this.luckyValueProbability = getProbabilityOfWinning(growthTask.sumPoint);
   }
 }
 
@@ -165,7 +117,6 @@ class CheckIn {
   username = "";
   growthTask!: GrowthTask;
   dipLuckyTask!: DipLuckyTask;
-  lotteriesTask!: LotteriesTask;
   bugfixTask!: BugfixTask;
   sdkTask!: SdkTask;
 
@@ -186,14 +137,12 @@ class CheckIn {
 
     this.growthTask = new GrowthTask(juejin);
     this.dipLuckyTask = new DipLuckyTask(juejin);
-    this.lotteriesTask = new LotteriesTask(juejin);
     this.bugfixTask = new BugfixTask(juejin);
     this.sdkTask = new SdkTask(juejin);
 
     await this.sdkTask.run();
     await this.growthTask.run();
     await this.dipLuckyTask.run();
-    await this.lotteriesTask.run(this.growthTask, this.dipLuckyTask);
     await this.bugfixTask.run();
     await juejin.logout();
     console.log("-------------------------");
@@ -202,16 +151,6 @@ class CheckIn {
   }
 
   toString() {
-    const drawLotteryHistory = Object.entries(this.lotteriesTask.drawLotteryHistory)
-      .map(([lottery_id, count]) => {
-        const lotteryItem = this.lotteriesTask.lottery.find((item: any) => item.lottery_id == lottery_id);
-        if (lotteryItem) {
-          return `${lotteryItem.lottery_name}: ${count}`;
-        }
-        return `${lottery_id}: ${count}`;
-      })
-      .join("\n");
-
     const statusMap: Record<number, string> = {
       0: "签到失败",
       1: `签到成功 +${this.growthTask.incrPoint} 矿石`,
@@ -226,11 +165,6 @@ class CheckIn {
         当前矿石数 ${this.growthTask.sumPoint}
         当前未消除Bug数量 ${this.bugfixTask.userOwnBug}
         当前幸运值 ${this.dipLuckyTask.luckyValue}/6000
-        预测All In矿石累计幸运值比率 ${(this.lotteriesTask.luckyValueProbability * 100).toFixed(2) + "%"}
-        抽奖总次数 ${this.lotteriesTask.lotteryCount}
-        免费抽奖次数 ${this.lotteriesTask.freeCount}
-        ${this.lotteriesTask.lotteryOreGained > 0 ? `抽奖获得矿石 ${this.lotteriesTask.lotteryOreGained}` : ""}
-        ${this.lotteriesTask.lotteryCount > 0 ? "==============\n" + drawLotteryHistory + "\n==============" : ""}
         `.trim();
   }
 }
