@@ -32,4 +32,5 @@ jobs:
         run: |
           cd workflows
           npm install
-          npm run checkin 
+          npm run checkin
+          npm run lottery
